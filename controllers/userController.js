@@ -1,4 +1,4 @@
-const { Reaction, Thought, User } = require('../models');
+const { Thought, User } = require('../models');
 
 module.exports = {
     async getUsers(req, res) {
@@ -45,7 +45,7 @@ module.exports = {
             ).select('-__v');
 
             if (!updatedUser) {
-                return res.status(404).json({ message: 'No such user exists'});
+                return res.status(404).json({ message: 'No such user exists' });
             }
 
             res.json(updatedUser);
@@ -72,7 +72,17 @@ module.exports = {
 
     async addFriend(req, res) {
         try {
-            
+            const user = await User.findOneAndUpdate(
+                { _id: req.params.userId },
+                { $addToSet: { friends: req.params.friendId } },
+                { new: true, runValidators: true }
+            )
+
+            if (!user) {
+                res.status(404).json({ message: 'No such user exists' });
+            }
+
+            res.json(user);
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
