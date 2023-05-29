@@ -41,7 +41,7 @@ module.exports = {
             const updatedUser = await User.findOneAndUpdate(
                 { _id: req.params.userId },
                 req.body,
-                { new: true }
+                { new: true, runValidators: true,}
             ).select('-__v');
 
             if (!updatedUser) {
@@ -62,6 +62,8 @@ module.exports = {
             if (!user) {
                 return res.status(404).json({ message: 'No such user exists' });
             }
+
+            await Thought.deleteMany({ _id: { $in: user.thoughts } });
 
             res.json({ message: 'User successfully deleted' });
         } catch (err) {
@@ -91,7 +93,17 @@ module.exports = {
 
     async removeFriend(req, res) {
         try {
+            const user = await User.findOneAndUpdate(
+                { _id: req.params.userId },
+                { $pull: { friends: req.params.friendId } },
+                { new: true }
+            )
 
+            if (!user) {
+                res.status(404).json({ message: 'No such user exists' });
+            }
+
+            res.json(user);
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);

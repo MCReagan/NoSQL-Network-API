@@ -3,7 +3,7 @@ const { Thought, User } = require('../models');
 module.exports = {
     async getThoughts(req, res) {
         try {
-            const thoughts = await Thought.find().populate('reactions');
+            const thoughts = await Thought.find().populate('reactions').select('-__v');
 
             res.json(thoughts);
         } catch (err) {
@@ -77,6 +77,12 @@ module.exports = {
                 return res.status(404).json({ message: 'No such thought exists' });
             }
 
+            const user = await User.findOneAndUpdate(
+                { thoughts: req.params.thoughtId },
+                { $pull: { thoughts: req.params.thoughtId } },
+                { new: true }
+            );
+
             res.json({ message: 'Thought successfully deleted' });
         } catch (err) {
             console.log(err);
@@ -86,7 +92,17 @@ module.exports = {
 
     async addReaction(req, res) {
         try {
+            const thought = await Thought.findOneAndUpdate(
+                { _id: req.params.thoughtId },
+                { $addToSet: { reactions: body } },
+                { new: true, runValidators: true }
+            );
 
+            if (!thought) {
+                res.status(404).json({ message: 'No such thought exists' });
+            }
+
+            res.json(thought);
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
@@ -95,7 +111,17 @@ module.exports = {
 
     async removeReaction(req, res) {
         try {
+            const thought = await Thought.findOneAndUpdate(
+                {_id: req.params.thoughtId },
+                { $pull: { reactions: { reactionId: req.params.reactionId } } },
+                { new: true }
+            );
 
+            if (!thought) {
+                res.status(404).json({ message: 'No such thought exists' });
+            }
+
+            res.json(thought);
         } catch (err) {
             console.log(err);
             return res.status(500).json(err);
