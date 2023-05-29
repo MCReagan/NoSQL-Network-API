@@ -21,6 +21,13 @@ const thoughtSchema = new Schema(
             type: Schema.Types.ObjectId,
             ref: 'Reaction'
         }]
+    },
+    {
+      toJSON: {
+        virtuals: true,
+        getters: true,
+      },
+      id: false,
     }
 );
 
