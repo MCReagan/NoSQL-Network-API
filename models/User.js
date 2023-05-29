@@ -14,7 +14,7 @@ const userSchema = new Schema(
             unique: true,
             match: /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         },
-        thought: [{
+        thoughts: [{
             type: Schema.Types.ObjectId,
             ref: 'Thought'
         }],

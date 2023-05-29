@@ -49,7 +49,6 @@ module.exports = {
             }
 
             res.json(updatedUser);
-
         } catch (err) {
             console.err(err);
             return res.status(500).json(err);
