@@ -17,7 +17,7 @@ module.exports = {
             const user = await User.findOne({ _id: req.params.userId }).select('-__v');
 
             if (!user) {
-                return res.status(404).json({ message: 'No user with that ID' })
+                return res.status(404).json({ message: 'No user with that ID' });
             }
             res.json(user);
         } catch (err) {
@@ -28,7 +28,7 @@ module.exports = {
 
     async createUser(req, res) {
         try {
-            const user = await User.create(req.body)
+            const user = await User.create(req.body);
             res.json(user);
         } catch (err) {
             console.err(err);
@@ -38,6 +38,17 @@ module.exports = {
 
     async updateUser(req, res) {
         try {
+            const updatedUser = await User.findOneAndUpdate(
+                { _id: req.params.userId },
+                req.body,
+                { new: true }
+            ).select('-__v');
+
+            if (!updatedUser) {
+                return res.status(404).json({ message: 'No such user exists'});
+            }
+
+            res.json(updatedUser);
 
         } catch (err) {
             console.err(err);
@@ -53,7 +64,7 @@ module.exports = {
                 return res.status(404).json({ message: 'No such user exists' });
             }
 
-            res.json ({ message: 'User successfully deleted' });
+            res.json({ message: 'User successfully deleted' });
         } catch (err) {
             console.err(err);
             return res.status(500).json(err);
