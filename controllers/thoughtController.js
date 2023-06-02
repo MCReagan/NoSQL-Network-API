@@ -34,7 +34,7 @@ module.exports = {
             const thought = await Thought.create({ thoughtText, username });
 
             const user = await User.findByIdAndUpdate(
-                req.params.userId,
+                { _id: req.body.userId },
                 { $push: { thoughts: thought._id } },
                 { new: true }
             );
